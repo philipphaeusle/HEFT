@@ -215,6 +215,32 @@ function calcMakespan(data) {
     return result;
 }
 
+
+const currentCostsForServers=(data)=>{
+    let result={};
+    result.single=[];
+    result.total=0;
+    let i=0;
+    data.forEach(function(x){
+        let hourInSeconds=3600;
+        let time=x;
+        let costsperHour=parseFloat(price[i].Price);
+        let fullHours=Math.ceil(time/hourInSeconds);
+        let t=fullHours*costsperHour;
+
+        result.total+=t;
+        result.single.push({
+            server:i,
+            time:x,
+            chargedHours:fullHours,
+            costs:t
+        });
+        i++;
+    });
+
+    return result;
+};
+
 //the function that assigns sorted task list to workers;
 const assignToWorkers=(taskList)=>{
     let tempList=JSON.parse(JSON.stringify(taskList));
@@ -263,8 +289,10 @@ const assignToWorkers=(taskList)=>{
 };
 
 let result=assignToWorkers(prioritize());
-console.table(result.completedTasks);
 console.log("Makespan: "+calcMakespan(result.serverList)+" seconds");
+console.table(result.completedTasks);
+console.log("Total cost: "+ currentCostsForServers(result.serverList).total);
+console.table(currentCostsForServers(result.serverList).single);
 
 //console.table(assignToWorkers(prioritize()));
 
