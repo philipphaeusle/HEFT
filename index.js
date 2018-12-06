@@ -130,30 +130,6 @@ const computePriority=(task)=>{
     return w+max;
 };
 
-
-
-const comuteRandomSchedule=()=>{
-    let timeCopy=JSON.parse(JSON.stringify(time));
-    let processors=[];
-
-    let tasks=getAllTasks();
-    let instances=getAllInstances();
-
-    while(tasks.length>0){
-        let newTasks=[];
-        let startLength=tasks.length;
-        //do stuff
-        for (let i=0; i<tasks.length;i++){
-
-        }
-        tasks=newTasks;
-        if(startLength===tasks.length){
-            //nothing happened, wait a little
-        }
-    }
-
-};
-
 //returns a prioritized and sorted list of tasks
 const prioritize=()=>{
     let result=[];
@@ -167,12 +143,121 @@ const prioritize=()=>{
     return result;
 };
 
-//the function that assigns sorted task list to workers;
-const assignToWorkers=(taskList)=>{
-
+const checkIfTaskCompleted=(id,serverAssignments)=>{
+    let found=undefined;
+    serverAssignments.completedTasks.forEach(function(a){
+        if(a.taskId===id){
+            found=a;
+        }
+    });
+    return found;
 };
 
-assignToWorkers(prioritize());
+function assignToBestWorker(task, serverAssignments) {
+    let mustWaitFor=isDependentOn(task);
+    let mustWaitForArray=[];
+    let allFinished=true;
+    mustWaitFor.forEach(function (id){
+        let temp=checkIfTaskCompleted(id,serverAssignments);
+        if(temp===undefined){
+            allFinished= false;
+        }else{
+            mustWaitForArray.push(temp)
+        }
+    });
+
+    if(!allFinished){
+        return undefined
+    }
+
+    //let computationTime=[]; //times how long the computation takes for each server
+    let availableList=serverAssignments.serverList;
+    let bestStartTime=9999999999;
+    let bestFinishTime=9999999999;
+    let bestWorkerID;
+
+    for (let i=0; i<price.length; i++){
+        let earliestStartTime=0; //time when all tasks that are dependent are finished;
+        mustWaitFor.forEach(function(w){
+            if((w.finishTime + costs(w.serverId,price[i].id)) > earliestStartTime ){
+                earliestStartTime=w.finishTime + costs(w.serverId,price[i].id);
+            }
+        });
+
+        let startTime=Math.max(availableList[i], earliestStartTime);
+
+        let finishTime=startTime+takesTime(task,price[i].id);
+        if(bestFinishTime > finishTime ){
+            bestStartTime=startTime;
+            bestFinishTime=finishTime;
+            bestWorkerID=i;
+        }
+    }
+
+    serverAssignments.completedTasks.push({
+        taskId:task,
+        serverId:bestWorkerID,
+        startTime:bestStartTime,
+        tookTime:bestFinishTime-bestStartTime,
+        finishTime:bestFinishTime
+    });
+    availableList[bestWorkerID]=bestFinishTime;
+    return true;
+}
+
+//the function that assigns sorted task list to workers;
+const assignToWorkers=(taskList)=>{
+    let tempList=JSON.parse(JSON.stringify(taskList));
+    let serverAssignments= {
+        completedTasks:[], //an array of completed tasks, with their id, the server id they were assigned to, a starting time and an ending time;
+        serverList:[], //an array for every server, when he is available
+    };
+    serverAssignments.serverList=new Array(price.length).fill(0); //assign a starttime
+
+    let loop=true;
+    let loopCount=0;
+    while(tempList.length>0 && loop){
+        console.log('######################################################################################');
+        loop=false;
+        loopCount++;
+        let temp=[];
+        tempList.forEach(function(task){
+            let couldAssignTask=assignToBestWorker(task.id,serverAssignments);
+            if(couldAssignTask){
+                loop=true;
+            }else{
+                //could not assign this task;
+                temp.push(task);
+                console.log('______________________');
+                console.log(task.id);
+                console.log("DEPENDS ON: "+isDependentOn(task.id));
+                let arr=[];
+                serverAssignments.completedTasks.forEach(function(x){
+                    arr.push(x.taskId);
+                });
+                console.log("HAVE: "+arr);
+            }
+        });
+        console.log(temp);
+        tempList=temp;
+    };
+    if(!loop){
+        ///TODO: maxbe increase all start times
+        console.log('could not assign all tasks');
+
+    }
+    let arr=[];
+    serverAssignments.completedTasks.forEach(function(x){
+        arr.push(x.taskId);
+    });
+    return serverAssignments;
+};
+
+let result=assignToWorkers(prioritize());
+console.table(result.completedTasks);
+
+//console.table(assignToWorkers(prioritize()));
+
 
 
 
