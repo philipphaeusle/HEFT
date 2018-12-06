@@ -205,6 +205,16 @@ function assignToBestWorker(task, serverAssignments) {
     return true;
 }
 
+function calcMakespan(data) {
+    let result=0;
+    data.forEach(function(d){
+        if(d>result){
+            result=d;
+        }
+    });
+    return result;
+}
+
 //the function that assigns sorted task list to workers;
 const assignToWorkers=(taskList)=>{
     let tempList=JSON.parse(JSON.stringify(taskList));
@@ -217,7 +227,6 @@ const assignToWorkers=(taskList)=>{
     let loop=true;
     let loopCount=0;
     while(tempList.length>0 && loop){
-        console.log('######################################################################################');
         loop=false;
         loopCount++;
         let temp=[];
@@ -255,6 +264,7 @@ const assignToWorkers=(taskList)=>{
 
 let result=assignToWorkers(prioritize());
 console.table(result.completedTasks);
+console.log("Makespan: "+calcMakespan(result.serverList)+" seconds");
 
 //console.table(assignToWorkers(prioritize()));
 
