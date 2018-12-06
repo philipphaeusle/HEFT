@@ -1,0 +1,9 @@
+id, Type,Price
+0, m1.small,0.06
+1, m1.medium,0.12
+2, m3.medium,0.113
+3, m1.large,0.24
+4, m3.large,0.225
+5, m1.xlarge,0.48
+6, m3.xlarge,0.45
+7, m3.2xlarge,0.9
