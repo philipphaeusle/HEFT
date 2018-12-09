@@ -104,7 +104,7 @@ const averageComputationCostAmongAllNodes=(id)=> {
 };
 
 //conputes the Cij from Prioritizing tasks (https://en.wikipedia.org/wiki/Heterogeneous_Earliest_Finish_Time)
-const computAverageComputationCostsAmongAllNodes=(i, j)=> {
+const computAverageComunicationCostsAmongAllNodes=(i, j)=> {
     let all=0;
     for(let t=0; t<=price.length-1;t++){
         all=all+costs(i,j);
@@ -121,7 +121,7 @@ const computePriority=(task)=>{
 
     let max=0;
     succ.forEach(function(j){
-        let c=computAverageComputationCostsAmongAllNodes(i,j);
+        let c=computAverageComunicationCostsAmongAllNodes(i,j);
         let currentCost=c+computePriority(j);
         if(max<currentCost){
             max=currentCost;
@@ -276,7 +276,7 @@ const assignToWorkers=(taskList)=>{
         tempList=temp;
         if(!loop){
             console.log('could not assign all tasks, waiting..');
-            serverList.forEach(function(t){
+            serverAssignments.serverList.forEach(function(t){
                 t+=0.1;  //increase waiting time + 0.1s
             })
         }
@@ -311,6 +311,8 @@ const lossWeight=(task,oldInstance,newInstance)=>{
 };
 
 const reschedule=(taskId, newServer,data)=>{
+
+
 /*TODO:  rescheule task from one server to the other
 * */
 };
@@ -370,8 +372,10 @@ console.log("Makespan: "+calcMakespan(result.serverList)+" seconds");
 console.table(result.completedTasks);
 console.log("Total cost: "+ currentCostsForServers(result.serverList).total);
 console.table(currentCostsForServers(result.serverList).single);
-
 lossAlgorithm(result);
+// console.log(isDependentOn("ID00014"));
+// console.log(isDependentOn("ID00000"));
+// console.log(dependsOn("ID00000"));
 
 
 
