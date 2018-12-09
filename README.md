@@ -11,12 +11,18 @@ Dennis Sommer
 ## Implementation 
 
 For this implementation the wikipedia article: https://en.wikipedia.org/wiki/Heterogeneous_Earliest_Finish_Time is used to structure the development. 
-As described the first step is to prioritize the tasks. Therefore the average computation and communication time is calculated. 
+* As described the first step is to prioritize the tasks. Therefore the average computation and communication time is calculated. 
 The prioritization of a task is not independent from other tasks, since some depend on conclusion of other tasks. 
 
-Afterwards the tasks are assigned to workers. 
+* Afterwards the tasks are assigned to workers. 
 
 The Heft algorithm is done at this point and the LOSS algorithm is implemented to redistribute the tasks on the servers to obtain a solution, which stays inside the defined budget.  
+
+## Execution
+
+start index.js
+
+## Description
 
 ### index.js 
 
@@ -55,9 +61,12 @@ is the first function to be called, it prioritizes all tasks using the computePr
 returns if a task is completed. 
 
 #### assignToBestWorker
+Returns the true if the task can be completed successfully. Saves the server/worker, start and finish Time on Server, taskID in the result array. 
+In consideration of dependencies of all tasks related and if they are completed. 
 
 #### assignToWorkers
-
+after the tasks are prioritized the next step is to assign them to workers, for this the function assignToBestWorker is used.
+ 
 #### executionCosts
 returns the execution costs of a task meaning: time multiplied by cost per hour on the server.
 
@@ -68,6 +77,8 @@ implementation of the LossWeight algorithm from paper.
 returns the server with the biggest result in concern of finished time on the server, since this is the end of the overall workflow.
 
 #### lossAlgorithm
+implemented like described in paper page 7. 
+Done till the part of re assigning the task to another machine. 
 
 ## Lookout 
 The next step in the solution must be to: "Re-assign Task i to Machine j in S and calculate new cost of S". 
