@@ -65,6 +65,7 @@ const costs=(fromID, toID)=>{
         }
     });
     let size=temp[toID];
+    size=size/1000000;
     return size / networkBandwidth; //in seconds
 };
 
@@ -337,6 +338,7 @@ const lossAlgorithm=(data)=>{
     }
     let condition=costs>budget;
     let changed=true;
+    console.table(array);
     //while condition and not all reassignments tried
     while(condition && changed){
         let low=undefined;
@@ -373,9 +375,6 @@ console.table(result.completedTasks);
 console.log("Total cost: "+ currentCostsForServers(result.serverList).total);
 console.table(currentCostsForServers(result.serverList).single);
 lossAlgorithm(result);
-// console.log(isDependentOn("ID00014"));
-// console.log(isDependentOn("ID00000"));
-// console.log(dependsOn("ID00000"));
 
 
 
